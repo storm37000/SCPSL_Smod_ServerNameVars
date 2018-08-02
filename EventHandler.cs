@@ -61,13 +61,14 @@ namespace Smod.TestPlugin
             cfgname = cfgname.Replace("$scientists_start", "" + ev.Server.Round.Stats.ScientistsStart);
             cfgname = cfgname.Replace("$scientists_dead", "" + ev.Server.Round.Stats.ScientistsDead);
             //cfgname = cfgname.Replace("$scientists_counter", "" + ev.Server.NumPlayers);
-            cfgname = cfgname.Replace("$scp_alive_z", "" + ev.Server.Round.Stats.SCPAlive);
-            cfgname = cfgname.Replace("$scp_alive_noz", "" + (ev.Server.Round.Stats.SCPAlive - ev.Server.Round.Stats.Zombies));
+            cfgname = cfgname.Replace("$scp_alive", "" + ev.Server.Round.Stats.SCPAlive);
+            cfgname = cfgname.Replace("$scp_noz_alive", "" + (ev.Server.Round.Stats.SCPAlive - ev.Server.Round.Stats.Zombies));
             cfgname = cfgname.Replace("$scp_start", "" + ev.Server.Round.Stats.SCPStart);
             cfgname = cfgname.Replace("$scp_dead", "" + ev.Server.Round.Stats.SCPDead);
             cfgname = cfgname.Replace("$scp_zombies", "" + ev.Server.Round.Stats.Zombies);
             cfgname = cfgname.Replace("$scp_kills", "" + ev.Server.Round.Stats.SCPKills);
             //cfgname = cfgname.Replace("$scp_counter", "" + ev.Server.Round.Stats);
+            cfgname = cfgname.Replace("$ntf_alive", "" + ev.Server.Round.Stats.NTFAlive);
             cfgname = cfgname.Replace("$warhead_detonated", warheadDetonated(ev));
             cfgname = cfgname.Replace("$round_duration", "" + ev.Server.Round.Duration/60);
             cfgname = cfgname.Replace("$round_number", "" + RoundNumber);
