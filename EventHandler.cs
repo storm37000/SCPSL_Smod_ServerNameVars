@@ -121,6 +121,7 @@ namespace Smod.TestPlugin
 
         public void OnSetRole(PlayerSetRoleEvent ev)
         {
+            plugin.Info("player " + ev.Player.Name + "set as " + (Smod2.API.Team)ev.TeamRole.Team);
             if (ev.TeamRole.Team == Smod2.API.Team.CLASSD)
             {
                 ClassDStart++;
@@ -129,7 +130,7 @@ namespace Smod.TestPlugin
             {
                 ScientistStart++;
             }
-            if (ev.TeamRole.Team == Smod2.API.Team.SCP || ev.Role != Smod2.API.Role.SCP_049_2)
+            if (ev.TeamRole.Team == Smod2.API.Team.SCP && ev.Role != Smod2.API.Role.SCP_049_2)
             {
                 SCPStart++;
             }
