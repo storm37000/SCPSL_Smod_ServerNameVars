@@ -58,6 +58,10 @@ namespace Smod.TestPlugin
             EventHandler events = new EventHandler(this);
             this.AddEventHandler(typeof(IEventHandlerSetServerName), events, Priority.Highest);
             this.AddEventHandler(typeof(IEventHandlerRoundStart), events, Priority.Highest);
+            this.AddEventHandler(typeof(IEventHandlerPlayerDie), events, Priority.Highest);
+            this.AddEventHandler(typeof(IEventHandlerCheckEscape), events, Priority.Highest);
+            this.AddEventHandler(typeof(IEventHandlerSetRole), events, Priority.Highest);
+            this.AddEventHandler(typeof(IEventHandlerWarheadDetonate), events, Priority.Highest);
         }
     }
 }
