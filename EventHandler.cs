@@ -119,20 +119,23 @@ namespace Smod.TestPlugin
             }
         }
 
-        public void OnSetRole(PlayerSetRoleEvent ev)
+        public void OnSetRole(PlayerSetRoleEvent ev) //this event isnt working correctly, setting the values way too low.
         {
-            plugin.Info("player " + ev.Player.Name + "set as " + (Smod2.API.Team)ev.TeamRole.Team);
+            plugin.Info("player " + ev.Player.Name + " set as " + (Smod2.API.Team)ev.TeamRole.Team);
             if (ev.TeamRole.Team == Smod2.API.Team.CLASSD)
             {
                 ClassDStart++;
+                plugin.Info("ClassDStart" + ClassDStart);
             }
             if (ev.TeamRole.Team == Smod2.API.Team.SCIENTISTS)
             {
                 ScientistStart++;
+                plugin.Info("ScientistStart" + ScientistStart);
             }
             if (ev.TeamRole.Team == Smod2.API.Team.SCP && ev.Role != Smod2.API.Role.SCP_049_2)
             {
                 SCPStart++;
+                plugin.Info("SCPStart" + SCPStart);
             }
         }
 
