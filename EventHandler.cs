@@ -1,10 +1,11 @@
 ﻿using Smod2;
 using Smod2.Events;
 using Smod2.EventHandlers;
+using System.Text;
 
 namespace Smod.TestPlugin
 {
-    class EventHandler : IEventHandlerSetServerName, IEventHandlerRoundStart, IEventHandlerPlayerDie, IEventHandlerCheckEscape, IEventHandlerSetRole, IEventHandlerWarheadDetonate
+    class EventHandler : IEventHandlerSetServerName, IEventHandlerRoundStart, IEventHandlerRoundEnd, IEventHandlerPlayerDie, IEventHandlerCheckEscape, IEventHandlerSetRole, IEventHandlerWarheadDetonate
     {
         private Plugin plugin;
         public uint RoundNumber { get; private set; } = 0;
@@ -21,7 +22,20 @@ namespace Smod.TestPlugin
             this.plugin = plugin;
         }
 
-        private void cleanup()
+        public string RemoveSpecialCharacters(string str)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (char c in str)
+            {
+                if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '.' || c == '_' || c== ' ')
+                {
+                    sb.Append(c);
+                }
+            }
+            return sb.ToString();
+        }
+
+        private void reset()
         {
             SCPKills = 0;
             ClassDEscapes = 0;
@@ -95,8 +109,33 @@ namespace Smod.TestPlugin
 
         public void OnRoundStart(RoundStartEvent ev)
         {
-            cleanup();
             RoundNumber++;
+            if (PluginManager.Manager.FindEnabledPlugins("LaterJoin").Count == 0)
+            {
+                foreach (Smod2.API.Player ply in ev.Server.GetPlayers())
+                {
+                    if (ply.TeamRole.Team == Smod2.API.Team.CLASSD)
+                    {
+                        ClassDStart++;
+                    }
+                    if (ply.TeamRole.Team == Smod2.API.Team.SCIENTISTS)
+                    {
+                        ScientistStart++;
+                    }
+                    if (ply.TeamRole.Team == Smod2.API.Team.SCP)
+                    {
+                        SCPStart++;
+                    }
+                }
+            }
+        }
+
+        public void OnRoundEnd(RoundEndEvent ev)
+        {
+            if (ev.Round.Duration >= 3)
+            {
+                reset();
+            }
         }
 
         public void OnPlayerDie(PlayerDeathEvent ev)
@@ -119,23 +158,23 @@ namespace Smod.TestPlugin
             }
         }
 
-        public void OnSetRole(PlayerSetRoleEvent ev) //this event isnt working correctly, setting the values way too low.
+        public void OnSetRole(PlayerSetRoleEvent ev)
         {
-            plugin.Info("player " + ev.Player.Name + " set as " + (Smod2.API.Team)ev.TeamRole.Team);
+            plugin.Info("player " + RemoveSpecialCharacters(ev.Player.Name) + " <" + ev.Player.SteamId + "> - team: " + (Smod2.API.Team)ev.Player.TeamRole.Team + " => " + (Smod2.API.Team)ev.TeamRole.Team);
             if (ev.TeamRole.Team == Smod2.API.Team.CLASSD)
             {
                 ClassDStart++;
-                plugin.Info("ClassDStart" + ClassDStart);
+                plugin.Info("ClassDStart " + ClassDStart);
             }
             if (ev.TeamRole.Team == Smod2.API.Team.SCIENTISTS)
             {
                 ScientistStart++;
-                plugin.Info("ScientistStart" + ScientistStart);
+                plugin.Info("ScientistStart " + ScientistStart);
             }
-            if (ev.TeamRole.Team == Smod2.API.Team.SCP && ev.Role != Smod2.API.Role.SCP_049_2)
+            if (ev.TeamRole.Team == Smod2.API.Team.SCP && ev.TeamRole.Role != Smod2.API.Role.SCP_049_2)
             {
                 SCPStart++;
-                plugin.Info("SCPStart" + SCPStart);
+                plugin.Info("SCPStart " + SCPStart);
             }
         }
 
