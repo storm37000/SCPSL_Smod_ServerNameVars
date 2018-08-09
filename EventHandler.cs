@@ -8,6 +8,8 @@ namespace Smod.TestPlugin
     class EventHandler : IEventHandlerSetServerName, IEventHandlerRoundStart, IEventHandlerRoundEnd, IEventHandlerPlayerDie, IEventHandlerCheckEscape, IEventHandlerSetRole, IEventHandlerWarheadDetonate
     {
         private Plugin plugin;
+        private System.Collections.Generic.List<string> blklst = new System.Collections.Generic.List<string>();
+
         public uint RoundNumber { get; private set; } = 0;
         public uint SCPKills { get; private set; } = 0;
         public uint ClassDEscapes { get; private set; } = 0;
@@ -37,6 +39,7 @@ namespace Smod.TestPlugin
 
         private void reset()
         {
+            blklst.Clear();
             SCPKills = 0;
             ClassDEscapes = 0;
             ScientistEscapes = 0;
@@ -160,21 +163,22 @@ namespace Smod.TestPlugin
 
         public void OnSetRole(PlayerSetRoleEvent ev)
         {
-            plugin.Info("player " + RemoveSpecialCharacters(ev.Player.Name) + " <" + ev.Player.SteamId + "> - team: " + (Smod2.API.Team)ev.Player.TeamRole.Team + " => " + (Smod2.API.Team)ev.TeamRole.Team);
+            if (ev.Player.TeamRole.Team == Smod2.API.Team.NONE || blklst.Contains(ev.Player.SteamId)) { return; }
             if (ev.TeamRole.Team == Smod2.API.Team.CLASSD)
             {
                 ClassDStart++;
-                plugin.Info("ClassDStart " + ClassDStart);
             }
             if (ev.TeamRole.Team == Smod2.API.Team.SCIENTISTS)
             {
                 ScientistStart++;
-                plugin.Info("ScientistStart " + ScientistStart);
             }
             if (ev.TeamRole.Team == Smod2.API.Team.SCP && ev.TeamRole.Role != Smod2.API.Role.SCP_049_2)
             {
                 SCPStart++;
-                plugin.Info("SCPStart " + SCPStart);
+            }
+            if (ev.TeamRole.Role != Smod2.API.Role.SPECTATOR)
+            {
+                blklst.Add(ev.Player.SteamId);
             }
         }
 
