@@ -49,17 +49,17 @@ namespace Smod.TestPlugin
             WarheadDetonated = false;
         }
 
-        private string fullPlayerCount(SetServerNameEvent ev)
-        {
-            if(ev.Server.NumPlayers/ev.Server.MaxPlayers == 1)
-            {
-                return "FULL";
-            }
-            else
-            {
-                return ev.Server.NumPlayers + "/" + ev.Server.MaxPlayers;
-            }
-        }
+//        private string fullPlayerCount(SetServerNameEvent ev)
+//        {
+//            if(ev.Server.NumPlayers/ev.Server.MaxPlayers == 1)
+//            {
+//                return "FULL";
+//            }
+//            else
+//            {
+//                return ev.Server.NumPlayers + "/" + ev.Server.MaxPlayers;
+//            }
+//        }
 
         private string warheadDetonated(SetServerNameEvent ev)
         {
@@ -79,7 +79,7 @@ namespace Smod.TestPlugin
 
             cfgname = cfgname.Replace("$player_count", "" + ev.Server.NumPlayers);
             cfgname = cfgname.Replace("$max_players", "" + ev.Server.MaxPlayers);
-            cfgname = cfgname.Replace("$full_player_count", fullPlayerCount(ev));
+            //cfgname = cfgname.Replace("$full_player_count", fullPlayerCount(ev));
             cfgname = cfgname.Replace("$port", "" + ev.Server.Port);
             cfgname = cfgname.Replace("$ip", ev.Server.IpAddress);
             //cfgname = cfgname.Replace("$number", "" + (ev.Server.Port - ConfigFile.GetIntList("port_queue")[0] + 1));
