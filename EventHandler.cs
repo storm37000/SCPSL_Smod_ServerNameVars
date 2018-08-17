@@ -10,13 +10,13 @@ namespace Smod.TestPlugin
         private Plugin plugin;
         private System.Collections.Generic.List<string> blklst = new System.Collections.Generic.List<string>();
 
-        public uint RoundNumber { get; private set; } = 0;
-        public uint SCPKills { get; private set; } = 0;
-        public uint ClassDEscapes { get; private set; } = 0;
-        public uint ScientistEscapes { get; private set; } = 0;
-        public uint ClassDStart { get; private set; } = 0;
-        public uint ScientistStart { get; private set; } = 0;
-        public uint SCPStart { get; private set; } = 0;
+        public ushort RoundNumber { get; private set; } = 0;
+        public ushort SCPKills { get; private set; } = 0;
+        public ushort ClassDEscapes { get; private set; } = 0;
+        public ushort ScientistEscapes { get; private set; } = 0;
+        public ushort ClassDStart { get; private set; } = 0;
+        public ushort ScientistStart { get; private set; } = 0;
+        public ushort SCPStart { get; private set; } = 0;
         public bool WarheadDetonated { get; private set; } = false;
 
         public EventHandler(Plugin plugin)
@@ -49,28 +49,21 @@ namespace Smod.TestPlugin
             WarheadDetonated = false;
         }
 
-//        private string fullPlayerCount(SetServerNameEvent ev)
-//        {
-//            if(ev.Server.NumPlayers/ev.Server.MaxPlayers == 1)
-//            {
-//                return "FULL";
-//            }
-//            else
-//            {
-//                return ev.Server.NumPlayers + "/" + ev.Server.MaxPlayers;
-//            }
-//        }
-
-        private string warheadDetonated(SetServerNameEvent ev)
+        private string Counter(SetServerNameEvent ev)
         {
-            if (WarheadDetonated)
+            if(ev.Server.NumPlayers/ev.Server.MaxPlayers == 1)
             {
-                return "☢ WARHEAD DETONATED ☢";
+                return "FULL";
             }
             else
             {
-                return "";
+                return ev.Server.NumPlayers + "/" + ev.Server.MaxPlayers;
             }
+        }
+
+        private string Counter(ushort current, ushort max)
+        {
+            return current + "/" + max;
         }
 
         public void OnSetServerName(SetServerNameEvent ev)
@@ -79,7 +72,7 @@ namespace Smod.TestPlugin
 
             cfgname = cfgname.Replace("$player_count", "" + ev.Server.NumPlayers);
             cfgname = cfgname.Replace("$max_players", "" + ev.Server.MaxPlayers);
-            //cfgname = cfgname.Replace("$full_player_count", fullPlayerCount(ev));
+            cfgname = cfgname.Replace("$full_player_count", Counter(ev));
             cfgname = cfgname.Replace("$port", "" + ev.Server.Port);
             cfgname = cfgname.Replace("$ip", ev.Server.IpAddress);
             //cfgname = cfgname.Replace("$number", "" + (ev.Server.Port - ConfigFile.GetIntList("port_queue")[0] + 1));
@@ -90,20 +83,20 @@ namespace Smod.TestPlugin
             cfgname = cfgname.Replace("$classd_escape", "" + ClassDEscapes);
             cfgname = cfgname.Replace("$classd_start", "" + ClassDStart);
             cfgname = cfgname.Replace("$classd_dead", "" + ev.Server.Round.Stats.ClassDDead);
-            //cfgname = cfgname.Replace("$classd_counter", "" + ev.Server.NumPlayers);
+            cfgname = cfgname.Replace("$classd_counter", "" + Counter(ClassDEscapes, ClassDStart));
             cfgname = cfgname.Replace("$scientists_alive", "" + ev.Server.Round.Stats.ScientistsAlive);
             cfgname = cfgname.Replace("$scientists_escape", "" + ScientistEscapes);
             cfgname = cfgname.Replace("$scientists_start", "" + ScientistStart);
             cfgname = cfgname.Replace("$scientists_dead", "" + ev.Server.Round.Stats.ScientistsDead);
-            //cfgname = cfgname.Replace("$scientists_counter", "" + ev.Server.NumPlayers);
+            cfgname = cfgname.Replace("$scientists_counter", "" + Counter(ScientistEscapes, ScientistStart));
             cfgname = cfgname.Replace("$scp_alive", "" + ev.Server.Round.Stats.SCPAlive);
             cfgname = cfgname.Replace("$scp_start", "" + SCPStart);
             cfgname = cfgname.Replace("$scp_dead", "" + ev.Server.Round.Stats.SCPDead);
             cfgname = cfgname.Replace("$scp_zombies", "" + ev.Server.Round.Stats.Zombies);
             cfgname = cfgname.Replace("$scp_kills", "" + SCPKills);
-            //cfgname = cfgname.Replace("$scp_counter", "" + ev.Server.Round.Stats);
+            cfgname = cfgname.Replace("$scp_counter", "" + Counter((ushort)ev.Server.Round.Stats.SCPAlive, SCPStart));
             cfgname = cfgname.Replace("$ntf_alive", "" + ev.Server.Round.Stats.NTFAlive);
-            cfgname = cfgname.Replace("$warhead_detonated", warheadDetonated(ev));
+            cfgname = cfgname.Replace("$warhead_detonated", WarheadDetonated ? "☢ WARHEAD DETONATED ☢" : "" );
             cfgname = cfgname.Replace("$round_duration", "" + ev.Server.Round.Duration/60);
             cfgname = cfgname.Replace("$round_number", "" + RoundNumber);
 
