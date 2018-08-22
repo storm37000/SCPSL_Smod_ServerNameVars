@@ -2,6 +2,7 @@
 using Smod2.Attributes;
 using Smod2.Events;
 using Smod2.EventHandlers;
+using System;
 
 namespace Smod.TestPlugin
 {
@@ -52,6 +53,13 @@ namespace Smod.TestPlugin
             }
         }
 
+        private EventHandler events;
+
+        public void addCustomVar(string varname, Func<string> callback, Plugin source)
+        {
+            events.addCustomVar(varname, callback, source);
+        }
+
         public string testy()
         {
             return "Hello world";
@@ -59,8 +67,8 @@ namespace Smod.TestPlugin
 
         public override void Register()
         {
+            events = new EventHandler(this);
             // Register Events
-            EventHandler events = new EventHandler(this);
             this.AddEventHandler(typeof(IEventHandlerSetServerName), events, Priority.Highest);
             this.AddEventHandler(typeof(IEventHandlerRoundStart), events, Priority.Highest);
             this.AddEventHandler(typeof(IEventHandlerRoundEnd), events, Priority.High);
@@ -73,8 +81,8 @@ namespace Smod.TestPlugin
             }
             this.AddEventHandler(typeof(IEventHandlerWarheadDetonate), events, Priority.Highest);
 
-            System.Func<string> callback = testy;
-            events.addCustomVar("test", callback, this);
+            Func<string> callback = testy;
+            this.addCustomVar("test", callback, this);
         }
     }
 }
