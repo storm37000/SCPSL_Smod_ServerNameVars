@@ -52,6 +52,11 @@ namespace Smod.TestPlugin
             }
         }
 
+        public string testy()
+        {
+            return "Hello world";
+        }
+
         public override void Register()
         {
             // Register Events
@@ -67,6 +72,9 @@ namespace Smod.TestPlugin
                 this.AddEventHandler(typeof(IEventHandlerSetRole), events, Priority.Highest);
             }
             this.AddEventHandler(typeof(IEventHandlerWarheadDetonate), events, Priority.Highest);
+
+            System.Func<string> callback = testy;
+            events.addCustomVar("test", callback, this);
         }
     }
 }

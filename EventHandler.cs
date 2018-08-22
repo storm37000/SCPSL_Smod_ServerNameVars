@@ -1,7 +1,7 @@
 ﻿using Smod2;
 using Smod2.Events;
 using Smod2.EventHandlers;
-using System.Text;
+using System;
 
 namespace Smod.TestPlugin
 {
@@ -9,6 +9,7 @@ namespace Smod.TestPlugin
     {
         private Plugin plugin;
         private System.Collections.Generic.List<string> blklst = new System.Collections.Generic.List<string>();
+        private System.Collections.Generic.Dictionary<string, Func<string>> cmdtable = new System.Collections.Generic.Dictionary<string, Func<string>>();
 
         public ushort RoundNumber { get; private set; } = 0;
         public ushort SCPKills { get; private set; } = 0;
@@ -24,12 +25,18 @@ namespace Smod.TestPlugin
             this.plugin = plugin;
         }
 
+        public void addCustomVar(string varname, Func<string> callback, Plugin source)
+        {
+            cmdtable[varname] = callback;
+            plugin.Info("Added custom var: $[" + varname + "]" + " From plugin: " + source.Details.id);
+        }
+
         public string RemoveSpecialCharacters(string str)
         {
-            StringBuilder sb = new StringBuilder();
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
             foreach (char c in str)
             {
-                if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '.' || c == '_' || c== ' ')
+                if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c =='.' || c==',' || c =='_' || c==' ' || c=='[' || c==']' || c=='{' || c=='}')
                 {
                     sb.Append(c);
                 }
@@ -99,6 +106,12 @@ namespace Smod.TestPlugin
             cfgname = cfgname.Replace("$warhead_detonated", WarheadDetonated ? "☢ WARHEAD DETONATED ☢" : "" );
             cfgname = cfgname.Replace("$round_duration", "" + ev.Server.Round.Duration/60);
             cfgname = cfgname.Replace("$round_number", "" + RoundNumber);
+
+            foreach (System.Collections.Generic.KeyValuePair<string, Func<string>> entry in cmdtable)
+            {
+                plugin.Info("$[" + entry.Key + "] ==> " + entry.Value);
+                //cfgname = cfgname.Replace("$[" + entry.Key + "]", "" + entry.Value);
+            }
 
             ev.ServerName = cfgname;
         }
