@@ -31,19 +31,6 @@ namespace Smod.TestPlugin
             plugin.Info("Added custom var: $[" + varname + "]" + " From plugin: " + source.Details.id);
         }
 
-        public string RemoveSpecialCharacters(string str)
-        {
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
-            foreach (char c in str)
-            {
-                if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c =='.' || c==',' || c =='_' || c==' ' || c=='[' || c==']' || c=='{' || c=='}')
-                {
-                    sb.Append(c);
-                }
-            }
-            return sb.ToString();
-        }
-
         private void reset()
         {
             blklst.Clear();
@@ -109,7 +96,7 @@ namespace Smod.TestPlugin
 
             foreach (System.Collections.Generic.KeyValuePair<string, Func<string>> entry in cmdtable)
             {
-                plugin.Info("$[" + entry.Key + "] ==> " + entry.Value);
+                plugin.Info("$[" + entry.Key + "] ==> " + entry.Value());
                 //cfgname = cfgname.Replace("$[" + entry.Key + "]", "" + entry.Value);
             }
 
