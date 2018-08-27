@@ -43,17 +43,17 @@ namespace Smod.TestPlugin
             WarheadDetonated = false;
         }
 
-        private string Counter(SetServerNameEvent ev)
-        {
-            if(ev.Server.NumPlayers/ev.Server.MaxPlayers == 1)
-            {
-                return "FULL";
-            }
-            else
-            {
-                return ev.Server.NumPlayers + "/" + ev.Server.MaxPlayers;
-            }
-        }
+//        private string Counter(SetServerNameEvent ev)
+//        {
+//            if(ev.Server.NumPlayers/ev.Server.MaxPlayers == 1)
+//            {
+//                return "FULL";
+//            }
+//            else
+//            {
+//                return ev.Server.NumPlayers + "/" + ev.Server.MaxPlayers;
+//            }
+//        }
 
         private string Counter(ushort current, ushort max)
         {
@@ -64,11 +64,11 @@ namespace Smod.TestPlugin
         {
             string cfgname = ConfigManager.Manager.Config.GetStringValue("sm_server_name", ev.ServerName);
 
-            cfgname = cfgname.Replace("$player_count", "" + ev.Server.NumPlayers);
-            cfgname = cfgname.Replace("$max_players", "" + ev.Server.MaxPlayers);
-            cfgname = cfgname.Replace("$full_player_count", Counter(ev));
-            cfgname = cfgname.Replace("$port", "" + ev.Server.Port);
-            cfgname = cfgname.Replace("$ip", ev.Server.IpAddress);
+            //cfgname = cfgname.Replace("$player_count", "" + ev.Server.NumPlayers);
+            //cfgname = cfgname.Replace("$max_players", "" + ev.Server.MaxPlayers);
+            //cfgname = cfgname.Replace("$full_player_count", Counter(ev));
+            //cfgname = cfgname.Replace("$port", "" + ev.Server.Port);
+            //cfgname = cfgname.Replace("$ip", ev.Server.IpAddress);
             //cfgname = cfgname.Replace("$number", "" + (ev.Server.Port - ConfigFile.GetIntList("port_queue")[0] + 1));
             //cfgname = cfgname.Replace("$lobby_id", "-");
             //cfgname = cfgname.Replace("$version", "-");
@@ -96,8 +96,7 @@ namespace Smod.TestPlugin
 
             foreach (System.Collections.Generic.KeyValuePair<string, Func<string>> entry in cmdtable)
             {
-                plugin.Info("$[" + entry.Key + "] ==> " + entry.Value());
-                //cfgname = cfgname.Replace("$[" + entry.Key + "]", "" + entry.Value);
+                cfgname = cfgname.Replace("$[" + entry.Key + "]", "" + entry.Value());
             }
 
             ev.ServerName = cfgname;
