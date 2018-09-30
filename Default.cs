@@ -4,7 +4,7 @@ using Smod2.Events;
 using Smod2.EventHandlers;
 using System;
 
-namespace Smod.TestPlugin
+namespace ServerNameVars
 {
     [PluginDetails(
         author = "storm37000",
