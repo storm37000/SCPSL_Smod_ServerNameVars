@@ -11,7 +11,7 @@ namespace ServerNameVars
         name = "ServerNameVars",
         description = "Readds server name statistics plus some new ones",
         id = "s37k.servernamevars",
-        version = "0.1.0",
+        version = "1.0.0",
         SmodMajor = 3,
         SmodMinor = 1,
         SmodRevision = 0
