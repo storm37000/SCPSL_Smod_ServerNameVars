@@ -11,7 +11,7 @@ namespace ServerNameVars
         name = "ServerNameVars",
         description = "Readds server name statistics plus some new ones",
         id = "s37k.servernamevars",
-        version = "1.0.0",
+        version = "1.0.1",
         SmodMajor = 3,
         SmodMinor = 1,
         SmodRevision = 0
@@ -26,32 +26,33 @@ namespace ServerNameVars
         {
             bool SSLerr = false;
             this.Info(this.Details.name + " has been enabled.");
-            while (true)
-            {
-                try
-                {
-                    string host = "https://storm37000.tk/addons/";
-                    if (SSLerr) { host = "http://74.91.115.126/addons/"; }
-                    ushort version = ushort.Parse(this.Details.version.Replace(".", string.Empty));
-                    ushort fileContentV = ushort.Parse(new System.Net.WebClient().DownloadString(host + this.Details.name + ".ver"));
-                    if (fileContentV > version)
-                    {
-                        this.Info("Your version is out of date, please visit the Smod discord and download the newest version");
-                    }
-                    break;
-                }
-                catch (System.Exception e)
-                {
-                    if (SSLerr == false && e.Message.Contains("The authentication or decryption has failed."))
-                    {
-                        SSLerr = true;
-                        continue;
-                    }
-                    this.Error("Could not fetch latest version txt: " + e.Message);
-                    break;
-                }
-            }
-        }
+			while (true)
+			{
+				try
+				{
+					string hostfile = "https://gist.githubusercontent.com/storm37000/6fee56ec4a46e332ced193318e5c510a/raw/533f378717513f7daf84b7ed06fd397fd893b21e/gistfile1.txt";
+					string host = new System.Net.WebClient().DownloadString(hostfile).Split('\n')[0];
+					if (SSLerr) { host = new System.Net.WebClient().DownloadString(hostfile).Split('\n')[1]; }
+					ushort version = ushort.Parse(this.Details.version.Replace(".", string.Empty));
+					ushort fileContentV = ushort.Parse(new System.Net.WebClient().DownloadString(host + this.Details.name + ".ver"));
+					if (fileContentV > version)
+					{
+						this.Info("Your version is out of date, please visit the Smod discord and download the newest version");
+					}
+					break;
+				}
+				catch (System.Exception e)
+				{
+					if (SSLerr == false)
+					{
+						SSLerr = true;
+						continue;
+					}
+					this.Error("Could not fetch latest version txt: " + e.Message);
+					break;
+				}
+			}
+		}
 
         private EventHandler events;
 
