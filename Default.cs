@@ -22,25 +22,11 @@ namespace ServerNameVars
         {
             this.Info(this.Details.name + " has been disabled.");
         }
-        public override void OnEnable()
-        {
-            bool SSLerr = false;
-            this.Info(this.Details.name + " has been enabled.");
-			string hostfile = "";
-			switch (Environment.OSVersion.Platform)
-			{
-				case PlatformID.Unix:
-					hostfile = "http://pastebin.com/raw/9VQi53JQ";
-					break;
-
-				case PlatformID.MacOSX:
-					hostfile = "http://pastebin.com/raw/9VQi53JQ";
-					break;
-
-				default:
-					hostfile = "https://pastebin.com/raw/9VQi53JQ";
-					break;
-			}
+		public override void OnEnable()
+		{
+			bool SSLerr = false;
+			this.Info(this.Details.name + " has been enabled.");
+			string hostfile = "http://pastebin.com/raw/9VQi53JQ";
 			string[] hosts = new System.Net.WebClient().DownloadString(hostfile).Split('\n');
 			while (true)
 			{
@@ -69,7 +55,7 @@ namespace ServerNameVars
 			}
 		}
 
-        private EventHandler events;
+		private EventHandler events;
 
         public void addCustomVar(string varname, Func<string> callback, Plugin source)
         {
