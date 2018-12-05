@@ -7,7 +7,7 @@ namespace ServerNameVars
 {
     class EventHandler : IEventHandlerSetServerName, IEventHandlerRoundStart, IEventHandlerRoundEnd, IEventHandlerPlayerDie, IEventHandlerCheckEscape, IEventHandlerSetRole, IEventHandlerWarheadDetonate
     {
-        private Plugin plugin;
+        private Main plugin;
         private System.Collections.Generic.List<string> blklst = new System.Collections.Generic.List<string>();
         private System.Collections.Generic.Dictionary<string, Func<string>> cmdtable = new System.Collections.Generic.Dictionary<string, Func<string>>();
 
@@ -20,7 +20,7 @@ namespace ServerNameVars
         public ushort SCPStart { get; private set; } = 0;
         public bool WarheadDetonated { get; private set; } = false;
 
-        public EventHandler(Plugin plugin)
+        public EventHandler(Main plugin)
         {
             this.plugin = plugin;
         }
@@ -90,11 +90,12 @@ namespace ServerNameVars
             cfgname = cfgname.Replace("$scp_kills", "" + SCPKills);
             cfgname = cfgname.Replace("$scp_counter", "" + Counter((ushort)ev.Server.Round.Stats.SCPAlive, SCPStart));
             cfgname = cfgname.Replace("$ntf_alive", "" + ev.Server.Round.Stats.NTFAlive);
-            cfgname = cfgname.Replace("$warhead_detonated", WarheadDetonated ? "☢ WARHEAD DETONATED ☢" : "" );
+			cfgname = cfgname.Replace("$ci_alive", "" + ev.Server.Round.Stats.CiAlive);
+			cfgname = cfgname.Replace("$warhead_detonated", WarheadDetonated ? "☢ WARHEAD DETONATED ☢" : "" );
             cfgname = cfgname.Replace("$round_duration", "" + ev.Server.Round.Duration/60);
             cfgname = cfgname.Replace("$round_number", "" + RoundNumber);
 
-            foreach (System.Collections.Generic.KeyValuePair<string, Func<string>> entry in cmdtable)
+			foreach (System.Collections.Generic.KeyValuePair<string, Func<string>> entry in cmdtable)
             {
                 cfgname = cfgname.Replace("$[" + entry.Key + "]", "" + entry.Value());
             }
