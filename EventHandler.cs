@@ -20,6 +20,8 @@ namespace ServerNameVars
 		public ushort SCPStart { get; private set; } = 0;
 		public bool WarheadDetonated { get; private set; } = false;
 
+		public bool hasLJ { get; set; } = false;
+
 		public EventHandler(Main plugin)
 		{
 			this.plugin = plugin;
@@ -106,7 +108,7 @@ namespace ServerNameVars
 		public void OnRoundStart(RoundStartEvent ev)
 		{
 			RoundNumber++;
-			if (PluginManager.Manager.FindEnabledPlugins("LaterJoin").Count == 0)
+			if (hasLJ == false)
 			{
 				foreach (Smod2.API.Player ply in ev.Server.GetPlayers())
 				{
@@ -114,7 +116,7 @@ namespace ServerNameVars
 					{
 						ClassDStart++;
 					}
-					if (ply.TeamRole.Team == Smod2.API.Team.SCIENTISTS)
+					if (ply.TeamRole.Team == Smod2.API.Team.SCIENTIST)
 					{
 						ScientistStart++;
 					}
@@ -156,12 +158,13 @@ namespace ServerNameVars
 
 		public void OnSetRole(PlayerSetRoleEvent ev)
 		{
+			if (hasLJ == false) { return; }
 			if (ev.Player.TeamRole.Team == Smod2.API.Team.NONE || blklst.Contains(ev.Player.SteamId)) { return; }
 			if (ev.TeamRole.Team == Smod2.API.Team.CLASSD)
 			{
 				ClassDStart++;
 			}
-			if (ev.TeamRole.Team == Smod2.API.Team.SCIENTISTS)
+			if (ev.TeamRole.Team == Smod2.API.Team.SCIENTIST)
 			{
 				ScientistStart++;
 			}

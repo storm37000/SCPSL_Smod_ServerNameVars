@@ -1,6 +1,5 @@
 ﻿using Smod2;
 using Smod2.Attributes;
-using Smod2.Events;
 using Smod2.EventHandlers;
 using System;
 
@@ -11,9 +10,9 @@ namespace ServerNameVars
 		name = "ServerNameVars",
 		description = "Readds server name statistics plus some new ones",
 		id = "s37k.servernamevars",
-		version = "1.0.2",
+		version = "1.0.3",
 		SmodMajor = 3,
-		SmodMinor = 1,
+		SmodMinor = 2,
 		SmodRevision = 0
 		)]
 	class Main : Plugin
@@ -74,17 +73,12 @@ namespace ServerNameVars
 		{
 			events = new EventHandler(this);
 			// Register Events
-			this.AddEventHandler(typeof(IEventHandlerSetServerName), events, Priority.Highest);
-			this.AddEventHandler(typeof(IEventHandlerRoundStart), events, Priority.Highest);
-			this.AddEventHandler(typeof(IEventHandlerRoundEnd), events, Priority.High);
-			this.AddEventHandler(typeof(IEventHandlerPlayerDie), events, Priority.Highest);
-			this.AddEventHandler(typeof(IEventHandlerCheckEscape), events, Priority.Highest);
+			this.AddEventHandlers(events);
 			if (PluginManager.Manager.FindEnabledPlugins("LaterJoin").Count > 0)
 			{
+				events.hasLJ = true;
 				this.Info("Laterjoin integration enabled.");
-				this.AddEventHandler(typeof(IEventHandlerSetRole), events, Priority.Highest);
 			}
-			this.AddEventHandler(typeof(IEventHandlerWarheadDetonate), events, Priority.Highest);
 
 			Func<string> callback = testy;
 			this.addCustomVar("test", callback, this);
