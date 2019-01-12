@@ -5,7 +5,7 @@ using System;
 
 namespace ServerNameVars
 {
-	class EventHandler : IEventHandlerSetServerName, IEventHandlerRoundStart, IEventHandlerRoundEnd, IEventHandlerPlayerDie, IEventHandlerCheckEscape, IEventHandlerSetRole, IEventHandlerWarheadDetonate
+	class EventHandler : IEventHandlerSetServerName, IEventHandlerRoundStart, IEventHandlerRoundEnd, IEventHandlerPlayerDie, IEventHandlerCheckEscape, IEventHandlerSetRole, IEventHandlerWarheadDetonate, IEventHandlerSCP914Activate
 	{
 		private Main plugin;
 		private System.Collections.Generic.List<string> blklst = new System.Collections.Generic.List<string>();
@@ -19,6 +19,7 @@ namespace ServerNameVars
 		public ushort ScientistStart { get; private set; } = 0;
 		public ushort SCPStart { get; private set; } = 0;
 		public bool WarheadDetonated { get; private set; } = false;
+		public ushort scp914activates { get; private set; } = 0;
 
 		public bool hasLJ { get; set; } = false;
 
@@ -43,6 +44,7 @@ namespace ServerNameVars
 			ScientistStart = 0;
 			SCPStart = 0;
 			WarheadDetonated = false;
+			scp914activates = 0;
 		}
 
 //        private string Counter(SetServerNameEvent ev)
@@ -96,6 +98,7 @@ namespace ServerNameVars
 			cfgname = cfgname.Replace("$warhead_detonated", WarheadDetonated ? "☢ WARHEAD DETONATED ☢" : "" );
 			cfgname = cfgname.Replace("$round_duration", "" + ev.Server.Round.Duration/60);
 			cfgname = cfgname.Replace("$round_number", "" + RoundNumber);
+			cfgname = cfgname.Replace("$914uses", "" + scp914activates);
 
 			foreach (System.Collections.Generic.KeyValuePair<string, Func<string>> entry in cmdtable)
 			{
@@ -181,6 +184,11 @@ namespace ServerNameVars
 		public void OnDetonate()
 		{
 			WarheadDetonated = true;
+		}
+
+		public void OnSCP914Activate(SCP914ActivateEvent ev)
+		{
+			scp914activates++;
 		}
 	}
 }

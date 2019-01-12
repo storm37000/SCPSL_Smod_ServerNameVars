@@ -1,6 +1,5 @@
 ﻿using Smod2;
 using Smod2.Attributes;
-using Smod2.EventHandlers;
 using System;
 
 namespace ServerNameVars
@@ -13,7 +12,7 @@ namespace ServerNameVars
 		version = "1.0.3",
 		SmodMajor = 3,
 		SmodMinor = 2,
-		SmodRevision = 0
+		SmodRevision = 2
 		)]
 	class Main : Plugin
 	{
