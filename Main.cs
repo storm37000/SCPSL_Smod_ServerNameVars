@@ -9,7 +9,7 @@ namespace ServerNameVars
 		name = "ServerNameVars",
 		description = "Readds server name statistics plus some new ones",
 		id = "s37k.servernamevars",
-		version = "1.0.3",
+		version = "1.0.4",
 		SmodMajor = 3,
 		SmodMinor = 2,
 		SmodRevision = 2
@@ -56,7 +56,7 @@ namespace ServerNameVars
 			}
 		}
 
-		private EventHandler events;
+		public EventHandler events;
 
 		public void addCustomVar(string varname, Func<string> callback, Plugin source)
 		{
@@ -73,11 +73,6 @@ namespace ServerNameVars
 			events = new EventHandler(this);
 			// Register Events
 			this.AddEventHandlers(events);
-			if (PluginManager.Manager.FindEnabledPlugins("LaterJoin").Count > 0)
-			{
-				events.hasLJ = true;
-				this.Info("Laterjoin integration enabled.");
-			}
 
 			Func<string> callback = testy;
 			this.addCustomVar("test", callback, this);
