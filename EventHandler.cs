@@ -112,6 +112,10 @@ namespace ServerNameVars
 
 		public void OnRoundStart(RoundStartEvent ev)
 		{
+			if (!plugin.UpToDate)
+			{
+				plugin.outdatedmsg();
+			}
 			RoundNumber++;
 		}
 
