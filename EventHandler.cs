@@ -129,7 +129,7 @@ namespace ServerNameVars
 
 			ev.ServerName = cfgname;
 
-			ServerName = ev.ServerName + "<br>" + "Players: " + ev.Server.NumPlayers + "/" + ev.Server.MaxPlayers;
+			ServerName = ev.ServerName + "<br>" + "Players: " + (ev.Server.NumPlayers - 1) + "/" + ev.Server.MaxPlayers;
 
 			try
 			{
