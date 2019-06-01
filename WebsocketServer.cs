@@ -22,7 +22,7 @@ namespace ServerNameVars
 	class WebsocketServer
 	{
 		static WebSockClientManager m;
-		public WebsocketServer(Main plugin, ref string name, ushort port, string protoname, int maxconn)
+		public WebsocketServer(Main plugin, ref string name, ushort port, int maxconn)
 		{
 			TcpListener t = new TcpListener(IPAddress.Parse("0.0.0.0"), port);
 			m = new WebSockClientManager(maxconn, port, plugin);
@@ -36,7 +36,7 @@ namespace ServerNameVars
 				Thread.Sleep(300);
 				if (w.WebSocketConnectionStatus == WebSockClient.WebSockClientStatus.HANDSHAKEDONE)
 				{
-					w.WriteBuffer = ASCIIEncoding.ASCII.GetBytes("Hello Client " + w.ManagingThreadId.ToString());
+					w.WriteBuffer = UTF8Encoding.UTF8.GetBytes("Hello Client " + w.ManagingThreadId.ToString());
 				}
 
 			}
@@ -260,7 +260,7 @@ namespace ServerNameVars
 					if (wc.TcpClientInstance.Connected && wc.WebSocketConnectionStatus == WebSockClient.WebSockClientStatus.HANDSHAKEDONE
 						&& wc.IsSubscribed)
 					{
-						wc.WriteBuffer = Encoding.ASCII.GetBytes(data);
+						wc.WriteBuffer = UTF8Encoding.UTF8.GetBytes(data);
 					}
 
 				}

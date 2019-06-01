@@ -37,7 +37,7 @@ namespace ServerNameVars
 //				Console.WriteLine("Invalid max connection number specified in config file.");
 //				return;
 //			}
-			new Thread(new ThreadStart(() => new WebsocketServer(this.plugin, ref srvrname, 8001, "scpsl",128))).Start();
+			new Thread(new ThreadStart(() => new WebsocketServer(this.plugin, ref srvrname, 8081,128))).Start();
 		}
 
 		public void addCustomVar(string varname, Func<string> callback, Plugin source)
