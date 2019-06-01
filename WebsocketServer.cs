@@ -51,19 +51,9 @@ namespace ServerNameVars
 	class WebSockClient
 	{
 		public int ManagingThreadId { get; set; }
-//		public string WebSocketOrigin { get; set; }
-//		public string WebSocketLocationURL { get; set; }
-		public bool IsSubscribed { get; set; }
-		private byte[] _buffer = new byte[255];
-		private byte[] _writeBuffer;
+		public List<byte[]> WriteBuffer = new List<byte[]>();
 		private TcpClient _tcpClient;
 		public WebSockClientStatus WebSocketConnectionStatus { get; set; }
-
-		public byte[] WriteBuffer
-		{
-			set { _writeBuffer = value; }
-			get { return _writeBuffer; }
-		}
 
 		public TcpClient TcpClientInstance
 		{ get { return _tcpClient; } }
@@ -91,7 +81,6 @@ namespace ServerNameVars
 		private List<WebSockClient> _clientList;
 		private delegate void ClientHandler(WebSockClient c);
 		private static int _port, _maxConnection;
-		private static string _origin, _location;
 		private static Main _plugin;
 
 		private WebSockClientManager()
@@ -157,40 +146,33 @@ namespace ServerNameVars
 				int b;
 				c.WebSocketConnectionStatus = WebSockClient.WebSockClientStatus.CONNECTING;
 				using (NetworkStream n = c.TcpClientInstance.GetStream())
-				using (StreamWriter streamWriter = new StreamWriter(n))
+				//using (StreamWriter streamWriter = new StreamWriter(n))
 				{
 					c.WebSocketConnectionStatus = WebSockClient.WebSockClientStatus.CONNECTING;
 
 					while (c.TcpClientInstance.Connected)
 					{
-						Thread.Sleep(1);
-						//Read and Validate client Handshake.
-//						if (c.WebSocketConnectionStatus == WebSockClient.WebSockClientStatus.CONNECTING)
-//						{
-//						}
 						//Send Sever Handshake to client.
 						if (c.WebSocketConnectionStatus == WebSockClient.WebSockClientStatus.CONNECTING)
 						{
-							Byte[] bytes = new Byte[512];
+							Byte[] bytes = new Byte[1024];
+							//Read and Validate client Handshake.
 							while (n.DataAvailable){
 								n.Read(bytes, 0, bytes.Length);
 							}
 							//translate bytes of request to string
 							String data = Encoding.UTF8.GetString(bytes);
+							//_plugin.Info(data);
 							string handshake =
 							"HTTP/1.1 101 Switching Protocols" + "\r\n"
-							+ "Connection: Upgrade" + "\r\n"
 							+ "Upgrade: websocket" + "\r\n"
-							+ "Sec-WebSocket-Accept: " + Convert.ToBase64String(
-								System.Security.Cryptography.SHA1.Create().ComputeHash(
-									Encoding.UTF8.GetBytes(
-										new System.Text.RegularExpressions.Regex("Sec-WebSocket-Key: (.*)").Match(data).Groups[1].Value.Trim() + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
-									)
-								)
-							) + "\r\n"
+							+ "Connection: Upgrade" + "\r\n"
+							+ "Sec-WebSocket-Accept: " + Convert.ToBase64String(System.Security.Cryptography.SHA1.Create().ComputeHash(Encoding.UTF8.GetBytes(new System.Text.RegularExpressions.Regex("Sec-WebSocket-Key: (.*)").Match(data).Groups[1].Value.Trim() + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"))) + "\r\n"
+							+ "Sec-WebSocket-Protocol: scpsl" + "\r\n"
 							+ "\r\n";
-							streamWriter.Write(handshake);
-							streamWriter.Flush();
+							//streamWriter.Write(handshake);
+							//streamWriter.Flush();
+							c.WriteBuffer.Add(UTF8Encoding.UTF8.GetBytes(handshake));
 							c.WebSocketConnectionStatus = WebSockClient.WebSockClientStatus.HANDSHAKEDONE;
 						}
 
@@ -217,14 +199,15 @@ namespace ServerNameVars
 //						}
 
 						// If Writebuffer is full, write stuff to client
-						if (c.WriteBuffer != null && c.WriteBuffer.Length > 0)
+						foreach (byte[] bytes in c.WriteBuffer)
 						{
+							_plugin.Info(UTF8Encoding.UTF8.GetString(bytes));
 							n.WriteByte(0x00);
-							n.Write(c.WriteBuffer, 0, c.WriteBuffer.Length);
+							n.Write(bytes, 0, bytes.Length);
 							n.WriteByte(0xff);
-							c.WriteBuffer = null;
+							c.WriteBuffer.Remove(bytes);
 						}
-
+						Thread.Sleep(1);
 					}
 				}
 			}
@@ -252,7 +235,7 @@ namespace ServerNameVars
 				{
 					if (wc.TcpClientInstance.Connected && wc.WebSocketConnectionStatus == WebSockClient.WebSockClientStatus.HANDSHAKEDONE)
 					{
-						wc.WriteBuffer = UTF8Encoding.UTF8.GetBytes(data);
+						wc.WriteBuffer.Add(UTF8Encoding.UTF8.GetBytes(data));
 					}
 
 				}
