@@ -11,9 +11,9 @@ namespace ServerNameVars
 	[PluginDetails(
 		author = "storm37000",
 		name = "ServerNameVars",
-		description = "Readds server name statistics plus some new ones",
+		description = "Adds new server name variables.",
 		id = "s37k.servernamevars",
-		version = "1.0.5",
+		version = "1.1.0",
 		SmodMajor = 3,
 		SmodMinor = 2,
 		SmodRevision = 2

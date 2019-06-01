@@ -4,6 +4,8 @@ using Smod2.EventHandlers;
 using System;
 using Smod2.EventSystem.Events;
 
+using System.Threading;
+
 namespace ServerNameVars
 {
 	class EventHandler : IEventHandlerSetServerName, IEventHandlerRoundStart, IEventHandlerRoundEnd, IEventHandlerPlayerDie, IEventHandlerSetRole, IEventHandlerWarheadDetonate, IEventHandlerSCP914Activate, IEventHandlerDecideTeamRespawnQueue
@@ -12,6 +14,7 @@ namespace ServerNameVars
 		private System.Collections.Generic.List<string> blklst = new System.Collections.Generic.List<string>();
 		private System.Collections.Generic.Dictionary<string, Func<string>> cmdtable = new System.Collections.Generic.Dictionary<string, Func<string>>();
 		private ushort altroundnumber = 0;
+		private string srvrname = "";
 
 		public ushort RoundNumber { get; private set; } = 0;
 		public ushort SCPKills { get; private set; } = 0;
@@ -24,6 +27,17 @@ namespace ServerNameVars
 		public EventHandler(Main plugin)
 		{
 			this.plugin = plugin;
+//			if (!ushort.TryParse(port, out _port))
+//			{
+//				Console.WriteLine("Invalid port number specified in config file.");
+//				return;
+//			}
+//			if (!int.TryParse(System.Configuration.ConfigurationSettings.AppSettings["MAXCONNECTIONCOUNT"], out _maxConnection))
+//			{
+//				Console.WriteLine("Invalid max connection number specified in config file.");
+//				return;
+//			}
+			new Thread(new ThreadStart(() => new WebsocketServer(this.plugin, ref srvrname, 8001, "scpsl",128))).Start();
 		}
 
 		public void addCustomVar(string varname, Func<string> callback, Plugin source)
