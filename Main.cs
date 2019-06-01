@@ -28,7 +28,6 @@ namespace ServerNameVars
 		{
 			this.Info(this.Details.name + " has been enabled.");
 		}
-
 		public bool UpToDate { get; private set; } = true;
 
 		public void outdatedmsg()
@@ -84,6 +83,10 @@ namespace ServerNameVars
 
 		public override void Register()
 		{
+			this.AddConfig(new Smod2.Config.ConfigSetting("srvnamevars_WebSocketServer_Enabled", false, Smod2.Config.SettingType.BOOL, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("srvnamevars_WebSocketServer_Port", 8081, Smod2.Config.SettingType.NUMERIC, true, ""));
+			this.AddConfig(new Smod2.Config.ConfigSetting("srvnamevars_WebSocketServer_ServiceName", "scpsl", Smod2.Config.SettingType.STRING, true, ""));
+
 			events = new EventHandler(this);
 			// Register Events
 			this.AddEventHandlers(events);

@@ -4,8 +4,6 @@ using Smod2.EventHandlers;
 using System;
 using Smod2.EventSystem.Events;
 
-using System.Threading;
-
 namespace ServerNameVars
 {
 	class EventHandler : IEventHandlerSetServerName, IEventHandlerRoundStart, IEventHandlerRoundEnd, IEventHandlerPlayerDie, IEventHandlerSetRole, IEventHandlerWarheadDetonate, IEventHandlerSCP914Activate, IEventHandlerDecideTeamRespawnQueue
@@ -14,7 +12,8 @@ namespace ServerNameVars
 		private System.Collections.Generic.List<string> blklst = new System.Collections.Generic.List<string>();
 		private System.Collections.Generic.Dictionary<string, Func<string>> cmdtable = new System.Collections.Generic.Dictionary<string, Func<string>>();
 		private ushort altroundnumber = 0;
-		private string srvrname = "";
+
+		private WebsocketServer wssvr;
 
 		public ushort RoundNumber { get; private set; } = 0;
 		public ushort SCPKills { get; private set; } = 0;
@@ -23,21 +22,34 @@ namespace ServerNameVars
 		public ushort SCPStart { get; private set; } = 0;
 		public bool WarheadDetonated { get; private set; } = false;
 		public ushort scp914activates { get; private set; } = 0;
+		public string ServerName { get; private set; }
 
 		public EventHandler(Main plugin)
 		{
 			this.plugin = plugin;
-//			if (!ushort.TryParse(port, out _port))
-//			{
-//				Console.WriteLine("Invalid port number specified in config file.");
-//				return;
-//			}
-//			if (!int.TryParse(System.Configuration.ConfigurationSettings.AppSettings["MAXCONNECTIONCOUNT"], out _maxConnection))
-//			{
-//				Console.WriteLine("Invalid max connection number specified in config file.");
-//				return;
-//			}
-			new Thread(new ThreadStart(() => new WebsocketServer(this.plugin, ref srvrname, 8081,128))).Start();
+			if (plugin.GetConfigBool("srvnamevars_WebSocketServer_Enabled"))
+			{
+				ushort port;
+				if (!ushort.TryParse(plugin.GetConfigInt("srvnamevars_WebSocketServer_Port").ToString(), out port))
+				{
+					plugin.Error("Invalid port number specified in config file.");
+					return;
+				}
+				if (port <= 2000)
+				{
+					plugin.Error("Invalid port number specified in config file.");
+					return;
+				}
+				plugin.Info("attempting to start websocket server...");
+				try
+				{
+					wssvr = new WebsocketServer(this, port, plugin.GetConfigString("srvnamevars_WebSocketServer_ServiceName"));
+				}
+				catch
+				{
+					plugin.Error("Failed to start websocket server! (are you missing the dependency dll?)");
+				}
+			}
 		}
 
 		public void addCustomVar(string varname, Func<string> callback, Plugin source)
@@ -116,6 +128,16 @@ namespace ServerNameVars
 			}
 
 			ev.ServerName = cfgname;
+
+			ServerName = ev.ServerName + "<br>" + "Players: " + ev.Server.NumPlayers + "/" + ev.Server.MaxPlayers;
+
+			try
+			{
+				wssvr.sendmsg(ServerName);
+			}
+			catch
+			{
+			}
 		}
 
 		public void OnDecideTeamRespawnQueue(DecideRespawnQueueEvent ev)
