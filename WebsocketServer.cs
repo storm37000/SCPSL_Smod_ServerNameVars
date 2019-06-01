@@ -27,26 +27,32 @@ namespace ServerNameVars
 			TcpListener t = new TcpListener(IPAddress.Parse("0.0.0.0"), port);
 			m = new WebSockClientManager(maxconn, port, plugin);
 			t.Start();
+			new Thread(new ThreadStart(() => new bcastname(plugin, m))).Start();
 			while (true)
 			{
 				TcpClient c = t.AcceptTcpClient();
 				//c.Client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.KeepAlive, true);
 				WebSockClient w = new WebSockClient(c);
 				m.AddClient(w);
-				Thread.Sleep(300);
-				if (w.WebSocketConnectionStatus == WebSockClient.WebSockClientStatus.HANDSHAKEDONE)
-				{
-					w.WriteBuffer = UTF8Encoding.UTF8.GetBytes("Hello Client " + w.ManagingThreadId.ToString());
-				}
-
+			}
+		}
+	}
+	class bcastname
+	{
+		public bcastname(Main plugin, WebSockClientManager webSock)
+		{
+			while (true)
+			{
+				Thread.Sleep(1000);
+				webSock.WriteData("test");
 			}
 		}
 	}
 	class WebSockClient
 	{
 		public int ManagingThreadId { get; set; }
-		public string WebSocketOrigin { get; set; }
-		public string WebSocketLocationURL { get; set; }
+//		public string WebSocketOrigin { get; set; }
+//		public string WebSocketLocationURL { get; set; }
 		public bool IsSubscribed { get; set; }
 		private byte[] _buffer = new byte[255];
 		private byte[] _writeBuffer;
@@ -72,14 +78,12 @@ namespace ServerNameVars
 			CONNECTING = 0,
 			HANDSHAKEDONE = 3,
 			DISCONNECTED = 6,
-			CLIENTSUBSCRIBED = 7,
-			CLIENTUNSUBSCRIBED = 8
 		}
-		public WebSockClient(string webSockOrigin, string webSockLocationURL)
-		{
-			this.WebSocketLocationURL = webSockLocationURL;
-			this.WebSocketOrigin = webSockOrigin;
-		}
+//		public WebSockClient(string webSockOrigin, string webSockLocationURL)
+//		{
+//			this.WebSocketLocationURL = webSockLocationURL;
+//			this.WebSocketOrigin = webSockOrigin;
+//		}
 
 	}
 	class WebSockClientManager
@@ -152,28 +156,27 @@ namespace ServerNameVars
 			{
 				int b;
 				c.WebSocketConnectionStatus = WebSockClient.WebSockClientStatus.CONNECTING;
-				c.IsSubscribed = true;
 				using (NetworkStream n = c.TcpClientInstance.GetStream())
 				using (StreamWriter streamWriter = new StreamWriter(n))
 				{
-					byte[] buff = new byte[255];
 					c.WebSocketConnectionStatus = WebSockClient.WebSockClientStatus.CONNECTING;
 
 					while (c.TcpClientInstance.Connected)
 					{
-
-
-
+						Thread.Sleep(1);
 						//Read and Validate client Handshake.
-						if (c.WebSocketConnectionStatus == WebSockClient.WebSockClientStatus.CONNECTING)
-							while (n.DataAvailable)
-							{ n.Read(buff, 0, buff.Length); }
-
+//						if (c.WebSocketConnectionStatus == WebSockClient.WebSockClientStatus.CONNECTING)
+//						{
+//						}
 						//Send Sever Handshake to client.
 						if (c.WebSocketConnectionStatus == WebSockClient.WebSockClientStatus.CONNECTING)
 						{
+							Byte[] bytes = new Byte[512];
+							while (n.DataAvailable){
+								n.Read(bytes, 0, bytes.Length);
+							}
 							//translate bytes of request to string
-							String data = Encoding.UTF8.GetString(buff);
+							String data = Encoding.UTF8.GetString(bytes);
 							string handshake =
 							"HTTP/1.1 101 Switching Protocols" + "\r\n"
 							+ "Connection: Upgrade" + "\r\n"
@@ -188,41 +191,33 @@ namespace ServerNameVars
 							+ "\r\n";
 							streamWriter.Write(handshake);
 							streamWriter.Flush();
-						}
-
-						if (c.TcpClientInstance.Connected)
-						{
 							c.WebSocketConnectionStatus = WebSockClient.WebSockClientStatus.HANDSHAKEDONE;
 						}
 
 						// Read data from client. Do whatever is required.
-						while (n.DataAvailable)
-						{
-							if (n.ReadByte() == 'S')
-								if (n.ReadByte() == 'T')
-								{
-									b = n.ReadByte();
-									if (b == 'P')
-									{
-										c.IsSubscribed = false;
-										_plugin.Info("Client:" + c.ManagingThreadId.ToString() + " unsubscribed");
-
-									}
-									else if (b == 'R')
-									{
-										c.IsSubscribed = true;
-										_plugin.Info("Client:" + c.ManagingThreadId.ToString() + " subscribed");
-									}
-
-								}
-
-								else
-									_plugin.Info("Client " + c.ManagingThreadId.ToString() + "says :" + n.ReadByte().ToString());
-						}
-
+//						while (n.DataAvailable && c.WebSocketConnectionStatus == WebSockClient.WebSockClientStatus.HANDSHAKEDONE)
+//						{
+//							if (n.ReadByte() == 'S')
+//								if (n.ReadByte() == 'T')
+//								{
+//									b = n.ReadByte();
+//									if (b == 'P')
+//									{
+//										c.IsSubscribed = false;
+//										_plugin.Info("Client:" + c.ManagingThreadId.ToString() + " unsubscribed");
+//									}
+//									else if (b == 'R')
+//									{
+//										c.IsSubscribed = true;
+//										_plugin.Info("Client:" + c.ManagingThreadId.ToString() + " subscribed");
+//									}
+//								}
+//								else
+//									_plugin.Info("Client " + c.ManagingThreadId.ToString() + "says :" + n.ReadByte().ToString());
+//						}
 
 						// If Writebuffer is full, write stuff to client
-						if (c.WriteBuffer != null && c.WriteBuffer.Length > 0 && c.IsSubscribed)
+						if (c.WriteBuffer != null && c.WriteBuffer.Length > 0)
 						{
 							n.WriteByte(0x00);
 							n.Write(c.WriteBuffer, 0, c.WriteBuffer.Length);
@@ -238,8 +233,6 @@ namespace ServerNameVars
 				if (c.TcpClientInstance.Connected == true)
 				{ _plugin.Info(e.StackTrace); }
 				return;
-
-
 			}
 			finally
 			{
@@ -257,8 +250,7 @@ namespace ServerNameVars
 			{
 				try
 				{
-					if (wc.TcpClientInstance.Connected && wc.WebSocketConnectionStatus == WebSockClient.WebSockClientStatus.HANDSHAKEDONE
-						&& wc.IsSubscribed)
+					if (wc.TcpClientInstance.Connected && wc.WebSocketConnectionStatus == WebSockClient.WebSockClientStatus.HANDSHAKEDONE)
 					{
 						wc.WriteBuffer = UTF8Encoding.UTF8.GetBytes(data);
 					}
